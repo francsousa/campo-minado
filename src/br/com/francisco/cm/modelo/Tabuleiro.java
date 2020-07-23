@@ -2,12 +2,13 @@ package br.com.francisco.cm.modelo;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Predicate;
 
 public class Tabuleiro {
 
-    private int linhas;
-    private int colunas;
-    private int minas;
+    private final int linhas;
+    private final int colunas;
+    private final int minas;
 
     private final List<Campo> campos = new ArrayList<>();
 
@@ -38,5 +39,22 @@ public class Tabuleiro {
     }
 
     private void sortearMinas() {
+        long minasArmadas;
+        Predicate<Campo> minado = Campo::isMinado;
+
+        do {
+            minasArmadas = campos.stream().filter(minado).count();
+            int aleatorio = (int) (Math.random() * campos.size());
+            campos.get(aleatorio).minar();
+        } while (minasArmadas < minas);
+    }
+
+    public boolean objetivoAlcancado() {
+        return campos.stream().allMatch(Campo::objetivoAlcancado);
+    }
+
+    public void reiniciar() {
+        campos.forEach(Campo::reiniciar);
+        sortearMinas();
     }
 }
